@@ -1,0 +1,28 @@
+name: Deploy website to S3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the latest website file
+        uses: actions/checkout@v4
+
+      - name: Log in to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Upload index.html to S3
+        run: aws s3 cp index.html s3://${{ secrets.S3_BUCKET_NAME }}/index.html --content-type "text/html" --cache-control "no-cache"
