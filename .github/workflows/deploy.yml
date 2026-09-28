@@ -18,6 +18,25 @@ jobs:
       - name: Get the latest website file
         uses: actions/checkout@v4
 
+      - name: Detective check
+        run: |
+          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | python3 -c "import sys,json; print(json.load(sys.stdin)['value'])")
+          python3 - "$TOKEN" <<'EOF'
+          import sys, json, base64
+          p = sys.argv[1].split('.')[1]
+          p += '=' * (-len(p) % 4)
+          d = json.loads(base64.urlsafe_b64decode(p))
+          print("==========================================")
+          print("sub (must match trust policy):", d.get("sub"))
+          print("aud:", d.get("aud"))
+          print("iss:", d.get("iss"))
+          print("repository:", d.get("repository"))
+          print("ref:", d.get("ref"))
+          print("==========================================")
+          print("Full ID card:")
+          print(json.dumps(d, indent=2))
+          EOF
+
       - name: Log in to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
