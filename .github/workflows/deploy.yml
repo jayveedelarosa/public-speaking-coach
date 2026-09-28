@@ -21,7 +21,7 @@ jobs:
       - name: Log in to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::651323680251:role/github-deploy-speaking-coach
           aws-region: us-east-1
 
       - name: Upload index.html to S3
