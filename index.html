@@ -149,6 +149,17 @@ h1 {
     text-overflow: ellipsis;
 }
 
+/* Desktop: show the file name beside the Choose File button */
+@media (min-width: 481px) {
+    .file-name {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 50%;
+        margin-top: 0;
+        margin-left: 12px;
+    }
+}
+
 .file-name.has-file {
     color: var(--gold);
     font-weight: 500;
