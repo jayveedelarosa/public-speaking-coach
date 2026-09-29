@@ -1,4 +1,4 @@
-name: Deploy website to S3
+name: Deploy SpeakReview
 
 on:
   push:
