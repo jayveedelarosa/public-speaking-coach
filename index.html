@@ -570,14 +570,25 @@ async function pollResult(speechId) {
     }, POLL_INTERVAL_MS);
 }
 
+// Makes text safe to put inside HTML by turning special characters into harmless codes
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function displayResult(data) {
     resultBox.style.display = "block";
 
-    const confidenceScore = data.avg_confidence ? Math.round(data.avg_confidence * 100) : 0;
+    const confidenceRaw = Number(data.avg_confidence);
+    const confidenceScore = Number.isFinite(confidenceRaw) ? Math.round(confidenceRaw * 100) : 0;
 
-    // Turns the AI's formatting (#, ##, ###, **bold**) into real bold text
+    // Escapes the AI's text first, then turns its formatting (#, ##, ###, **bold**) into real bold text
     const cleanFeedback = data.ai_feedback
-        ? data.ai_feedback
+        ? escapeHtml(data.ai_feedback)
             .trim()
             .replace(/^#{1,6}\s*(.*)$/gm, '<strong>$1</strong>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -589,7 +600,7 @@ function displayResult(data) {
     let breakdownHtml = '';
     if (data.filler_word_breakdown) {
         Object.entries(data.filler_word_breakdown).forEach(([word, count]) => {
-            breakdownHtml += `<div class="filler-tag">${word}: ${count}</div>`;
+            breakdownHtml += `<div class="filler-tag">${escapeHtml(word)}: ${escapeHtml(count)}</div>`;
         });
     }
 
@@ -597,11 +608,11 @@ function displayResult(data) {
         <div class="metrics-grid">
             <div class="metric-tile">
                 <label>Pacing (WPM)</label>
-                <span>${data.wpm ?? "0"}</span>
+                <span>${escapeHtml(data.wpm ?? "0")}</span>
             </div>
             <div class="metric-tile">
                 <label>Total Filler Words</label>
-                <span>${data.filler_word_total ?? "0"}</span>
+                <span>${escapeHtml(data.filler_word_total ?? "0")}</span>
             </div>
         </div>
 
