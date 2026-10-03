@@ -13,13 +13,13 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Get the latest website file
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Log in to AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::651323680251:role/github-deploy-public-speaking-coach
           aws-region: us-east-1
